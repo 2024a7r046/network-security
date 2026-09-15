@@ -1,0 +1,43 @@
+import hmac
+import hashlib
+import random
+import time
+
+secret = b"myShared"
+used_nonces = set()
+max_age = 10
+
+def create_response(nonce, timestamp):
+    message = str(nonce) + str(timestamp)
+    return hmac.new(secret, message.encode(), hashlib.sha256).hexdigest()
+
+def verify_response(nonce, timestamp, response):
+    current_time = int(time.time())
+
+    if nonce in used_nonces:
+        return "Replay Attack Detected"
+
+    if current_time - timestamp > max_age:
+        return "Response Expired"
+
+    expected = create_response(nonce, timestamp)
+
+    if hmac.compare_digest(response, expected):
+        used_nonces.add(nonce)
+        return "Authentication Successful"
+
+    return "Authentication Failed"
+
+
+print("CHALLENGE-RESPONSE AUTHENTICATION\n")
+
+nonce = random.randint(1000, 9999)
+timestamp = int(time.time())
+
+print("Server generated challenge:", nonce)
+
+correct_response = create_response(nonce, timestamp)
+
+response = input("Enter client response: ")
+
+print("\nResult:", verify_response(nonce, timestamp, response))
