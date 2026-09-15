@@ -1,0 +1,22 @@
+from hashlib import sha256
+
+def hashing(text):
+    return sha256(text.encode()).hexdigest()
+
+message = input("Enter original message: ")
+original_hash = hashing(message)
+
+print("Original Hash:", original_hash)
+
+received_message = input("Enter received message: ")
+received_hash = hashing(received_message)
+
+print("Received Hash:", received_hash)
+
+if original_hash == received_hash:
+    print("Data integrity verified")
+else:
+    print("Data has been modified")  
+ 
+
+
